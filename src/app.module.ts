@@ -1,28 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AccountsModule } from './accounts/accounts.module';
-import { LedgerModule } from './ledger/ledger.module';
-import { TransactionsModule } from './transactions/transactions.module';
-
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'ledger',
-      password: 'ledger123',
-      database: 'ledgerdb',
+      host: process.env.PGHOST,
+      port: Number(process.env.PGPORT),
+      username: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
-    AccountsModule,
-    LedgerModule,
-    TransactionsModule,
   ],
 })
 export class AppModule {}
-
