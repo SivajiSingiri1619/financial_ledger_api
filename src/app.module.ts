@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { AccountsModule } from './accounts/accounts.module';
+import { LedgerModule } from './ledger/ledger.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.PGHOST,
@@ -16,11 +13,10 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       autoLoadEntities: true,
-      synchronize: true,
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      synchronize: true, 
     }),
+    AccountsModule,
+    LedgerModule,
   ],
 })
 export class AppModule {}
