@@ -6,6 +6,7 @@ import { Get, Param } from '@nestjs/common';
 
 
 
+
 @Controller('accounts')
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
@@ -19,7 +20,8 @@ export class AccountsController {
 
   @Get(':id')
 async getAccount(@Param('id') id: string) {
-  return this.accountsService.getAccountWithBalance(id);
+  return this.accountsService.getAccount(id);
+
 }
 
 }

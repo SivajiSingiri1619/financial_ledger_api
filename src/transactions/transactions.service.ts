@@ -8,6 +8,8 @@ import { LedgerEntry, EntryType } from '../ledger/ledger-entry.entity';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { TransferDto } from './dto/transfer.dto';
 
+
+
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -33,7 +35,7 @@ export class TransactionsService {
         throw new Error('Account not found');
       }
 
-      // 1️ Create transaction (PENDING)
+      // 1️⃣ Create transaction (PENDING)
       const transaction = manager.create(Transaction, {
         destinationAccount: account,
         amount: depositDto.amount.toString(),
@@ -44,7 +46,7 @@ export class TransactionsService {
 
       await manager.save(transaction);
 
-      // 2️ Create ledger entry (CREDIT)
+      // 2️⃣ Create ledger entry (CREDIT)
       const ledgerEntry = manager.create(LedgerEntry, {
         account: account,
         entryType: EntryType.CREDIT,
@@ -53,7 +55,7 @@ export class TransactionsService {
 
       await manager.save(ledgerEntry);
 
-      // 3️ Mark transaction as COMPLETED
+      // 3️⃣ Mark transaction as COMPLETED
       transaction.status = TransactionStatus.COMPLETED;
       await manager.save(transaction);
 
@@ -64,7 +66,6 @@ export class TransactionsService {
     });
   }
 
-  // withdraw 
   async withdraw(withdrawDto: WithdrawDto) {
   return this.dataSource.transaction(async (manager) => {
     const account = await manager.findOne(Account, {
@@ -98,12 +99,12 @@ export class TransactionsService {
 
     const balance = Number(result.balance);
 
-    //  Prevent overdraft
+    // 🔴 Prevent overdraft
     if (balance < withdrawDto.amount) {
       throw new Error('Insufficient balance');
     }
 
-    // 1️ Create transaction (PENDING)
+    // 1️⃣ Create transaction (PENDING)
     const transaction = manager.create(Transaction, {
       sourceAccount: account,
       amount: withdrawDto.amount.toString(),
@@ -114,7 +115,7 @@ export class TransactionsService {
 
     await manager.save(transaction);
 
-    // 2️ Create ledger entry (DEBIT)
+    // 2️⃣ Create ledger entry (DEBIT)
     const ledgerEntry = manager.create(LedgerEntry, {
       account: account,
       entryType: EntryType.DEBIT,
@@ -123,7 +124,7 @@ export class TransactionsService {
 
     await manager.save(ledgerEntry);
 
-    // 3️ Mark transaction COMPLETED
+    // 3️⃣ Mark transaction COMPLETED
     transaction.status = TransactionStatus.COMPLETED;
     await manager.save(transaction);
 
@@ -135,7 +136,7 @@ export class TransactionsService {
   });
 }
 
-//  transfer logic
+
 async transfer(transferDto: TransferDto) {
   return this.dataSource.transaction(async (manager) => {
     const { sourceAccountId, destinationAccountId, amount } = transferDto;
@@ -144,7 +145,7 @@ async transfer(transferDto: TransferDto) {
       throw new Error('Source and destination accounts must be different');
     }
 
-    // 1️ Fetch accounts
+    // 1️⃣ Fetch accounts
     const sourceAccount = await manager.findOne(Account, {
       where: { id: sourceAccountId },
     });
@@ -157,7 +158,7 @@ async transfer(transferDto: TransferDto) {
       throw new Error('Account not found');
     }
 
-    // 2️ Calculate source balance
+    // 2️⃣ Calculate source balance
     const result = await manager
       .createQueryBuilder(LedgerEntry, 'ledger')
       .select(
@@ -180,12 +181,12 @@ async transfer(transferDto: TransferDto) {
 
     const balance = Number(result.balance);
 
-    //  Prevent overdraft
+    // 🔴 Prevent overdraft
     if (balance < amount) {
       throw new Error('Insufficient balance');
     }
 
-    // 3️ Create transaction (PENDING)
+    // 3️⃣ Create transaction (PENDING)
     const transaction = manager.create(Transaction, {
       sourceAccount,
       destinationAccount,
@@ -197,14 +198,14 @@ async transfer(transferDto: TransferDto) {
 
     await manager.save(transaction);
 
-    // 4️ Ledger entry: DEBIT source
+    // 4️⃣ Ledger entry: DEBIT source
     const debitEntry = manager.create(LedgerEntry, {
       account: sourceAccount,
       entryType: EntryType.DEBIT,
       amount: amount.toString(),
     });
 
-    // 5️ Ledger entry: CREDIT destination
+    // 5️⃣ Ledger entry: CREDIT destination
     const creditEntry = manager.create(LedgerEntry, {
       account: destinationAccount,
       entryType: EntryType.CREDIT,
@@ -213,7 +214,7 @@ async transfer(transferDto: TransferDto) {
 
     await manager.save([debitEntry, creditEntry]);
 
-    // 6️ Mark transaction COMPLETED
+    // 6️⃣ Mark transaction COMPLETED
     transaction.status = TransactionStatus.COMPLETED;
     await manager.save(transaction);
 

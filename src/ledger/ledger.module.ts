@@ -1,4 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { LedgerEntry } from './ledger-entry.entity';
 
-@Module({})
+@Module({
+  imports: [TypeOrmModule.forFeature([LedgerEntry])],
+  exports: [TypeOrmModule], // ✅ good practice
+})
 export class LedgerModule {}

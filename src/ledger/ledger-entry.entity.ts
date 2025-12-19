@@ -20,11 +20,9 @@ export class LedgerEntry {
   @ManyToOne(() => Account)
   account: Account;
 
-  @Column({
-    type: 'enum',
-    enum: EntryType,
-  })
-  entryType: EntryType;
+  @Column({ type: 'text' })
+  entryType: string;
+ 
 
   @Column('decimal', { precision: 18, scale: 2 })
   amount: string;

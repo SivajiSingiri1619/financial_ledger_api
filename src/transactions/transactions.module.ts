@@ -10,8 +10,7 @@ import { TransactionsController } from './transactions.controller';
   imports: [
     TypeOrmModule.forFeature([Transaction, Account, LedgerEntry]),
   ],
+  controllers: [TransactionsController], // 🔥 MUST
   providers: [TransactionsService],
-  exports: [TransactionsService],
-  controllers: [TransactionsController],
 })
 export class TransactionsModule {}

@@ -23,21 +23,16 @@ export class Account {
   @Column()
   userId: string;
 
-  @Column({
-    type: 'enum',
-    enum: AccountType,
-  })
-  type: AccountType;
+ @Column({ type: 'text' })
+  type: string;
+
 
   @Column()
   currency: string;
 
-  @Column({
-    type: 'enum',
-    enum: AccountStatus,
-    default: AccountStatus.ACTIVE,
-  })
-  status: AccountStatus;
+ @Column({ type: 'text', default: 'ACTIVE' })
+status: string;
+
 
   @CreateDateColumn()
   createdAt: Date;
